@@ -1,10 +1,6 @@
 syntax = "proto2";
 package whatever;
 message Twist {
-	optional float x = 1;
-	optional float y = 2;
-	optional float z = 3;
-	optional float rx = 4;
-	optional float ry = 5;
-	optional float rz = 6;
+	optional float steering = 2;
+	optional float movement = 3;
 }
