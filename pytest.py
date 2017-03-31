@@ -15,23 +15,28 @@ RHOST = '192.168.43.215'
 RPORT = 8887
 
 def recv_msg(sock):
-    # Read message length and unpack it into an integer
-    raw_msglen = recvall(sock, 4)
-    if not raw_msglen:
-        return None
-    msglen = struct.unpack('>I', raw_msglen)[0]
-    # Read the message data
-    return recvall(sock, msglen)
+	# Read message length and unpack it into an integer
+	raw_msglen = recvall(sock, 4)
+	if not raw_msglen:
+		return None
+	msglen = struct.unpack('>I', raw_msglen)[0]
+	# Read the message data
+	return recvall(sock, msglen)
 
 def recvall(sock, n):
-    # Helper function to recv n bytes or return None if EOF is hit
-    data = ''
-    while len(data) < n:
-        packet = sock.recv(n - len(data))
-        if not packet:
-            return None
-        data += packet
-    return data
+	# Helper function to recv n bytes or return None if EOF is hit
+	data = ''
+
+	while len(data) < n:
+		packet = sock.recv(n - len(data))
+
+		if getsizeof(packet) < 1000:
+			print 'Packet: ' + str(packet)
+
+		if not packet:
+			return None
+		data += packet
+	return data
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -59,7 +64,10 @@ while 1:
 	#Get the data from the socket. First 4bits are the length of the packet.
 	data = recv_msg(conn)
 
-	print 'Connected with ' + addr[0] + ' : ' + str(addr[1])# + '. Received data: ' + str(data)
+	if data is None:
+		break
+
+	#print 'Connected with ' + addr[0] + ' : ' + str(addr[1])# + '. Received data: ' + str(data)
 
 	#Get protobuf format
 	proto_img = message_pb2.Image()
@@ -70,7 +78,7 @@ while 1:
 	proto_img.ParseFromString(data)
 
 	print ''
-	print('Width: ' + str(proto_img.rows) + ', Height: ' + str(proto_img.cols) + ', data: ' + str(proto_img.pic))
+	#print('Width: ' + str(proto_img.rows) + ', Height: ' + str(proto_img.cols))# + ', data: ' + str(proto_img.pic))
 	print ''
 
 	#Decode message with OpenCV
