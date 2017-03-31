@@ -120,7 +120,9 @@ def send_loop(sock, msg):
 		sock.send(msg)
 	sock.close()
 
-
+###
+### The main of the program
+###
 
 conn, addr = connect()
 
