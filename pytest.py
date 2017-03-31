@@ -7,6 +7,7 @@ import time
 import struct
 import threading
 import message_pb2
+import movement_pb2
 import numpy as np
 
 HOST = '' #An available interface
@@ -91,8 +92,8 @@ def recv_msg_loop(conn, addr):
 		dec_img = cv2.imdecode(nparr, 1)
 
 		#Show the image with OpenCV
-		cv2.imshow("Image window", dec_img)
-		cv2.waitKey(3)
+		#cv2.imshow("Image window", dec_img)
+		#cv2.waitKey(3)
 
 		#conn.send('You are connected...')
 
@@ -117,7 +118,7 @@ def send_connect(addr, port):
 
 def send_loop(sock, msg):
 	while 1:
-		sock.send(msg)
+		send_msg(sock, msg)
 	sock.close()
 
 ###
@@ -130,7 +131,11 @@ t1 = threading.Thread(target=recv_msg_loop, args=(conn, addr))
 t1.daemon = True
 sock = send_connect(addr, 8887)
 print '2'
-t2 = threading.Thread(target=send_loop, args=(sock, "Helluuuu"))
+sending = movement_pb2.Move()
+sending.steering = 0.5
+sending.movement = 0
+msg = sending.SerializeToString()
+t2 = threading.Thread(target=send_loop, args=(sock, msg))
 t2.daemon = True
 try:
 	t1.start()
