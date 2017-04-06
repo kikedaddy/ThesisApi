@@ -92,8 +92,8 @@ def recv_msg_loop(conn, addr):
 		dec_img = cv2.imdecode(nparr, 1)
 
 		#Show the image with OpenCV
-		#cv2.imshow("Image window", dec_img)
-		#cv2.waitKey(3)
+		cv2.imshow("Image window", dec_img)
+		cv2.waitKey(3)
 
 		#conn.send('You are connected...')
 

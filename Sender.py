@@ -13,7 +13,7 @@ import threading
 import time
 
 sendPort = 8888
-sendAddress = '83.248.104.77'
+sendAddress = ''		#'83.248.104.77'
 max_listen = 10
 
 class Sender:
@@ -32,7 +32,7 @@ class Sender:
 			self.socksend = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socksend.connect((sendAddress,sendPort))
 		except socket.error as msg:
-			print "Connection failed"
+			print "Connection failed: " + str(msg)
 			sys.exit()
 
 	def imgCallback(self, msg):
