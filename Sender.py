@@ -12,8 +12,6 @@ import message_pb2
 import threading
 import time
 
-#sendPort = 8888
-#sendAddress = '83.248.104.77'
 
 class Sender:
 	def __init__(self, socketIP, socketPort):
@@ -33,7 +31,7 @@ class Sender:
 			self.socksend = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.socksend.connect((socketIP,socketPort))
 		except socket.error as msg:
-			print "Connection failed"
+			print "Connection failed: " + str(msg)
 			sys.exit()
 
 	def imgCallback(self, msg):
