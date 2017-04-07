@@ -1,5 +1,6 @@
 import rospy
 import socket
+import SocketParser
 import struct
 import cv2
 import numpy as np
@@ -13,25 +14,26 @@ import threading
 import time
 from geometry_msgs.msg import Twist
 
-listenPort = 8887
-listenAddress = ''
-max_listen = 10
+#listenPort = 8887
+#listenAddress = ''
+#max_listen = 1
 
 class Receiver:
-	def __init__(self):
-		self.setupSockets()
+	def __init__(self, socketIP, socketPort, maxListen):
 		rospy.init_node('Receiver', anonymous=False)
+		self.setupSockets(socketIP, socketPort, maxListen)
 		# What function to call when you ctrl + c    
 		rospy.on_shutdown(self.shutdown)
 		self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
+		#self.receiveServer()
 
-	def setupSockets(self):
+	def setupSockets(self, socketIP, socketPort, maxListen):
 		#Start the receiving socket
 		self.sockrec = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.sockrec.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		try:
-			self.sockrec.bind((listenAddress, listenPort))
-			self.sockrec.listen(max_listen)
+			self.sockrec.bind((socketIP, socketPort))
+			self.sockrec.listen(maxListen)
 		except socket.error as msg:
 			print "Connection failed"
 			sys.exit()
@@ -41,18 +43,16 @@ class Receiver:
 		conn, addr = self.sockrec.accept()
 		print "GETS HERE"
 		
-		while not rospy.is_shutdown():
+		while not (rospy.is_shutdown() or self.offline):
 			#Get the data from the socket. First 4bits are the length of the packet.
-			data = self.recv_msg(conn)
+			data = SocketParser.recv_msg(conn)
 
 			if data is None:
-				break
-
-			print "connected with " + addr[0] + ":" + str(addr[1]) + ", received: " + str(data)
-			
-			move_cmd = self.makeCmd(data)
-			
-			self.cmd_vel.publish(move_cmd)
+				self.shutdown()
+			else:
+				print "connected with " + addr[0] + ":" + str(addr[1]) + ", received: " + str(data)
+				move_cmd = self.makeCmd(data)
+				self.cmd_vel.publish(move_cmd)
 
 	def makeCmd(self, str_proto):
 		cmd = movement_pb2.Move()
@@ -62,28 +62,6 @@ class Receiver:
 		move_cmd.angular.z = cmd.steering
 		return move_cmd
 
-
-	def recv_msg(self, sock):
-		# Read message length and unpack it into an integer
-		raw_msglen = self.recvall(sock, 4)
-		if not raw_msglen:
-			return None
-		msglen = struct.unpack('>I', raw_msglen)[0]
-		# Read the message data
-		return self.recvall(sock, msglen)
-
-	def recvall(self, sock, n):
-		# Helper function to recv n bytes or return None if EOF is hit
-		data = ''
-
-		while len(data) < n:
-			packet = sock.recv(n - len(data))
-
-			if not packet:
-				return None
-			data += packet
-		return data
-
 	def shutdown(self):
 		print "Shutdown"
 		self.sockrec.close()
@@ -91,6 +69,7 @@ class Receiver:
 		self.cmd_vel.publish(Twist())
 		# sleep just makes sure TurtleBot receives the stop command prior to shutting down the script
 		rospy.sleep(1)
+		self.offline = True
 
-receiver = Receiver()
-receiver.receiveServer()
+#receiver = Receiver()
+#receiver.receiveServer()

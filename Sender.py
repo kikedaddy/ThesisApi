@@ -12,25 +12,26 @@ import message_pb2
 import threading
 import time
 
-sendPort = 8888
-sendAddress = '83.248.104.77'
-max_listen = 10
+#sendPort = 8888
+#sendAddress = '83.248.104.77'
 
 class Sender:
-	def __init__(self):
+	def __init__(self, socketIP, socketPort):
+		rospy.init_node('Sender', anonymous = False)
+
 		self.bridge = CvBridge()
 		#Setup Socket
-		self.setupSockets()
+		self.setupSockets(socketIP, socketPort)
 		rospy.on_shutdown(self.shutdown)
-		self.n = 0					####Take Away!
 		#Subscribe to the image
 		self.image_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.imgCallback)
+		self.start()
 
-	def setupSockets(self):
+	def setupSockets(self, socketIP, socketPort):
 		#Start the receiving socket
 		try:
 			self.socksend = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			self.socksend.connect((sendAddress,sendPort))
+			self.socksend.connect((socketIP,socketPort))
 		except socket.error as msg:
 			print "Connection failed"
 			sys.exit()
@@ -39,24 +40,19 @@ class Sender:
 		#Convert Ros Image to CV Image
 		try:
 			cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-		except CvBridgeError as e:
-			print("Error converting image: " + e)
-		#Encode Image
-		encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),50]
-		result,encimg=cv2.imencode('.jpg',cv_image,encode_param)
-		#Convert encoded image to string
-		img_str = encimg.tostring()
-		#Get img info
-		(rows,cols,channels) = cv_image.shape
-		if self.n < 2000:					####### TAKE AWAY
+			#Encode Image
+			encode_param=[int(cv2.IMWRITE_JPEG_QUALITY),50]
+			result,encimg=cv2.imencode('.jpg',cv_image,encode_param)
+			#Convert encoded image to string
+			img_str = encimg.tostring()
+			#Get img info
+			(rows,cols,channels) = cv_image.shape
+			
 			send_str = self.makeProtoStr(rows,cols,channels,img_str)
 			self.send_msg(send_str)
-			self.n = self.n+1			#############TAKE AWAY
+		except CvBridgeError as e:
+			print("Error converting image: " + e)
 		
-		nparr = np.fromstring(img_str, np.uint8) 		#########Take Away
-		dec_img = cv2.imdecode(nparr,1)				########Take Away
-		cv2.imshow("Image window", dec_img)			#######Take Away
-		cv2.waitKey(3)								########TAKE AWAY
 
 	def makeProtoStr (self, rows,cols,channels,img_str):
 		sending = message_pb2.Image()
@@ -71,16 +67,22 @@ class Sender:
 	    msg = struct.pack('>I', len(msg)) + msg
 	    try:
 	    	self.socksend.send(msg)
+	    	self.recurrentError = 0
 	    except socket.error as e:
 	    	print "Error sending: " + str(e) 
+	    	if (self.recurrentError >= 3):
+	    		self.shutdown()
+	    	else:
+	    		self.recurrentError = self.recurrentError + 1
 
 	def shutdown(self):
 		print "Shutdown"
 		self.socksend.close()
+		self.offline = True
 
 
 
-rospy.init_node('Sender')
-sender = Sender()
-while not rospy.is_shutdown():
-	time.sleep(0.001)
+#sender = Sender()
+	def start(self):
+		while not (rospy.is_shutdown() or self.offline):
+			time.sleep(0.001)
