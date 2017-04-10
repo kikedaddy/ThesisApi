@@ -31,6 +31,7 @@ class Robot:
 				found = True
 				self.addr = addr
 		senderIp = self.addr[0]
+		server_socket.sendto("Response", addr)
 		server_socket.close()
 
 		self.receiver = Receiver(LISTEN_IP, LISTENING_PORT, MAX_LISTEN)

@@ -8,40 +8,26 @@ import threading
 import message_pb2
 import movement_pb2
 import numpy as np
+import SocketParser
 
-HOST = '127.0.0.1' #An available interface
-PORT = 8888 #Any port
+#HOST = '127.0.0.1' #An available interface
+#PORT = 8888 #Any port
 
 class SReceiver:
-	def recv_msg(self, sock):
-		# Read message length and unpack it into an integer
-		raw_msglen = self.recvall(sock, 4)
-		if not raw_msglen:
-			return None
-		msglen = struct.unpack('>I', raw_msglen)[0]
-		# Read the message data
-		return self.recvall(sock, msglen)
+	def __init__(self, IP, PORT, MAX_LISTEN):
+		conn, addr = receiver.connect(IP, PORT, MAX_LISTEN)
+		print 'Got here!'
+		self.recSock = conn
+		#receiver.recv_msg_loop()
 
-	def recvall(self, sock, n):
-		# Helper function to recv n bytes or return None if EOF is hit
-		data = ''
-
-		while len(data) < n:
-			packet = sock.recv(n - len(data))
-
-			if not packet:
-				return None
-			data += packet
-		return data
-
-	def connect(self):
+	def connect(self, IP, PORT, MAX_LISTEN):
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		print 'Socket created'
 
 		#Bind to addr/port
 		try:
-			s.bind((HOST, PORT))
+			s.bind((IP, PORT))
 		except socket.error as msg:
 			print 'Bind failed: ' + str(msg[0]) + ' with message: ' + msg[1]
 			sys.exit()
@@ -49,7 +35,7 @@ class SReceiver:
 		print 'Socket bind successful'
 
 		#Start listening on socket
-		s.listen(10)
+		s.listen(MAX_LISTEN)
 		print ' Socket is listening'
 
 		#Wait to accept connection
@@ -57,13 +43,13 @@ class SReceiver:
 
 		return conn, addr	#Could include socket in return
 
-	def recv_msg_loop(self, conn, addr):
+	def recv_msg_loop(self):
 		print 'before loop'
 		while 1:
 			#data = conn.recv(1024)	#Random size(1024) AND ADDED CONCAT
 			print 'Before recv_msg'
 			#Get the data from the socket. First 4bits are the length of the packet.
-			data = self.recv_msg(conn)
+			data = SocketParser.recv_msg(self.recSock)
 
 			print 'After recv_msg'
 
@@ -90,17 +76,6 @@ class SReceiver:
 			cv2.imshow("Image window", dec_img)
 			cv2.waitKey(3)
 
-			#conn.send('You are connected...')
+			#Do Something with IMAGE!!!!
+		self.recSock.close()
 
-		#conn.close() #Cannot close at this time
-
-receiver = SReceiver()
-
-conn, addr = receiver.connect()
-
-print 'Got here!'
-
-receiver.recv_msg_loop(conn, addr)
-
-#t1 = threading.Thread(target=receiver.recv_msg_loop, args=(conn, addr))
-#t1.daemon = True

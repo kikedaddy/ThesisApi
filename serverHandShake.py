@@ -7,7 +7,8 @@ server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR,1)
 server_socket.bind(address)
 
 while True:
-    print "Listening"
-    recv_data, addr = server_socket.recvfrom(2048)
-    print addr,':',recv_data
-server_socket.sendto("*"+recv_data, addr)
+	print "Listening"
+	recv_data, addr = server_socket.recvfrom(2048)
+	print addr,':',recv_data
+	server_socket.sendto("*"+recv_data, addr)
+	print "sent: " + "*"+recv_data + " to: " + str(addr)

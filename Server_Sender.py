@@ -6,14 +6,20 @@ import message_pb2
 import movement_pb2
 
 
-RHOST = "127.0.0.1"
-RPORT = 8888
+#RHOST = "127.0.0.1"
+#RPORT = 8888
 
 class SSender:
-	def send_msg(self, sock, msg):
+	def __init__(self, IP, PORT):
+		self.sockSend = self.send_connect(IP, PORT)
+
+
+
+	def send_cmd(self, steering, movement):
 		# Prefix each message with a 4-byte length (network byte order)
+		msg = self.create_msg(steering, movement)
 		msg = struct.pack('>I', len(msg)) + msg
-		sock.sendall(msg)
+		self.sockSend.sendall(msg)
 
 	def send_connect(self, addr, port):
 		s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,27 +38,10 @@ class SSender:
 
 		return s2
 
-	def send_loop(self, sock, msg):
+	def create_msg(self, steering, movement):
 		sending = movement_pb2.Move()
-		sending.steering = 1.5 #value from ROS
-		sending.movement = 2.0 #value from ROS
+		sending.steering = steering
+		sending.movement = movement
 
-		send_str = sending.SerializeToString()
+		return sending.SerializeToString()
 
-		while 1:
-			sock.send(send_str)
-		sock.close()
-
-sender = SSender()
-
-sock = sender.send_connect(RHOST, RPORT)
-print '2'
-sending = movement_pb2.Move()
-sending.steering = 0.5
-sending.movement = 0
-msg = sending.SerializeToString()
-
-sender.send_loop(sock, msg)
-
-#t2 = threading.Thread(target=sender.send_loop, args=(sock, msg))
-#t2.daemon = True
