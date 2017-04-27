@@ -22,6 +22,10 @@ class Sender:
 		#Setup Socket
 		self.setupSockets()
 		rospy.on_shutdown(self.shutdown)
+		###
+		###---ADDED NOW---
+		###
+		#rospy.init_node('Sender')
 		self.n = 0					####Take Away!
 		#Subscribe to the image
 		self.image_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.imgCallback)
@@ -80,7 +84,7 @@ class Sender:
 
 
 
-rospy.init_node('Sender')
-sender = Sender()
-while not rospy.is_shutdown():
-	time.sleep(0.001)
+#rospy.init_node('Sender')
+#sender = Sender()
+#while not rospy.is_shutdown():
+#	time.sleep(0.001)

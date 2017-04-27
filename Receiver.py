@@ -13,12 +13,13 @@ import threading
 import time
 from geometry_msgs.msg import Twist
 
-listenPort = 8887
+listenPort = 8888
 listenAddress = ''
 max_listen = 10
 
 class Receiver:
 	def __init__(self):
+		self.image = ''
 		self.setupSockets()
 		rospy.init_node('Receiver', anonymous=False)
 		# What function to call when you ctrl + c    
@@ -45,10 +46,12 @@ class Receiver:
 			#Get the data from the socket. First 4bits are the length of the packet.
 			data = self.recv_msg(conn)
 
+			self.image = data
+
 			if data is None:
 				break
 
-			print "connected with " + addr[0] + ":" + str(addr[1]) + ", received: " + str(data)
+			#print "connected with " + addr[0] + ":" + str(addr[1]) + ", received: " + str(data)
 			
 			move_cmd = self.makeCmd(data)
 			
@@ -92,5 +95,8 @@ class Receiver:
 		# sleep just makes sure TurtleBot receives the stop command prior to shutting down the script
 		rospy.sleep(1)
 
-receiver = Receiver()
-receiver.receiveServer()
+	def getImage(self):
+		return self.image
+
+#receiver = Receiver()
+#receiver.receiveServer()
