@@ -9,7 +9,8 @@ import time
 print "Starting receiver..."
 
 i = 0
-image = ''
+speed = ''
+angle = ''
 
 receiver = Receiver.Receiver()
 t1 = threading.Thread(target=receiver.receiveServer, args=())
@@ -22,10 +23,10 @@ print "Receiver started..."
 
 print "Rospy initiated..."
 
-sender = Server_Sender.SSender()
+sender = Server_Sender.SSender(0.5, 0.5)
 sock = sender.send_connect("localhost", 8888)
 
-t2 = threading.Thread(target=sender.send_loop, args=([sock, 0.5, 0.5]))
+t2 = threading.Thread(target=sender.send_loop, args=([sock]))
 t2.daemon = True
 t2.start()
 
@@ -33,10 +34,13 @@ t2.start()
 
 print "Sender initiated..."
 
-while i < 500:
+while i < 4500:
 	time.sleep(0.001)
-	if i == 48:
-		image = receiver.getImage()
+	if i == 1000:
+		sender.setSpeed(2)
+		sender.setAngle(3)
+
+		print str(receiver.getSpeed()) + ", " + str(receiver.getAngle())
+	if i == 4490:
+		print "And now: " + str(receiver.getSpeed()) + ", " + str(receiver.getAngle())
 	i += 1
-	if i == 49:
-		print str(image) + "This is the image we got from calling getImage()"

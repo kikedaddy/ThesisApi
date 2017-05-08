@@ -59,8 +59,8 @@ class Sender:
 		
 		nparr = np.fromstring(img_str, np.uint8) 		#########Take Away
 		dec_img = cv2.imdecode(nparr,1)				########Take Away
-		cv2.imshow("Image window", dec_img)			#######Take Away
-		cv2.waitKey(3)								########TAKE AWAY
+		#cv2.imshow("Image window", dec_img)			#######Take Away
+		#cv2.waitKey(3)								########TAKE AWAY
 
 	def makeProtoStr (self, rows,cols,channels,img_str):
 		sending = message_pb2.Image()

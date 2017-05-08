@@ -9,7 +9,7 @@ import message_pb2
 import movement_pb2
 import numpy as np
 
-HOST = '127.0.0.1' #An available interface
+HOST = '' #An available interface
 PORT = 8888 #Any port
 
 class SReceiver:

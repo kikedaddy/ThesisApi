@@ -19,7 +19,8 @@ max_listen = 10
 
 class Receiver:
 	def __init__(self):
-		self.image = ''
+		self.speed = 0
+		self.angle = 0
 		self.setupSockets()
 		rospy.init_node('Receiver', anonymous=False)
 		# What function to call when you ctrl + c    
@@ -46,24 +47,30 @@ class Receiver:
 			#Get the data from the socket. First 4bits are the length of the packet.
 			data = self.recv_msg(conn)
 
-			self.image = data
-
 			if data is None:
 				break
 
 			#print "connected with " + addr[0] + ":" + str(addr[1]) + ", received: " + str(data)
 			
 			move_cmd = self.makeCmd(data)
-			
-			self.cmd_vel.publish(move_cmd)
+
+			if move_cmd != None:
+				self.cmd_vel.publish(move_cmd)
 
 	def makeCmd(self, str_proto):
 		cmd = movement_pb2.Move()
 		cmd.ParseFromString(str_proto)
-		move_cmd = Twist()
-		move_cmd.linear.x = cmd.movement
-		move_cmd.angular.z = cmd.steering
-		return move_cmd
+
+		if self.speed != cmd.movement and self.angle != cmd.steering:
+			move_cmd = Twist()
+			move_cmd.linear.x = cmd.movement
+			move_cmd.angular.z = cmd.steering		
+			self.speed = move_cmd.linear.x
+			self.angle = move_cmd.angular.z
+			print "Different"
+			return move_cmd
+		else:
+			return None
 
 
 	def recv_msg(self, sock):
@@ -95,8 +102,11 @@ class Receiver:
 		# sleep just makes sure TurtleBot receives the stop command prior to shutting down the script
 		rospy.sleep(1)
 
-	def getImage(self):
-		return self.image
+	def getSpeed(self):
+		return self.speed
+
+	def getAngle(self):
+		return self.angle
 
 #receiver = Receiver()
 #receiver.receiveServer()
