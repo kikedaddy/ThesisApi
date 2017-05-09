@@ -24,7 +24,7 @@ class SSender:
 		s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-		print 'Addr: ' + str(addr) + ", Port: " + str(port)
+		#print 'Addr: ' + str(addr) + ", Port: " + str(port)
 
 		#Connect to host/port
 		try:
@@ -32,8 +32,6 @@ class SSender:
 		except socket.error as msg:
 			print 'Connection failed: ' + str(msg[0]) + ' with message: ' + msg[1]
 			sys.exit()
-
-		print 'got here'
 
 		return s2
 

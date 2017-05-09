@@ -13,7 +13,7 @@ import threading
 import time
 #
 
-sendPort = 8888
+sendPort = 8887
 sendAddress = ''		#'83.248.104.77'
 max_listen = 10
 
@@ -23,13 +23,15 @@ class Sender:
 		#Setup Socket
 		self.setupSockets()
 		rospy.on_shutdown(self.shutdown)
+		rospy.init_node('Sender')
 		###
 		###---ADDED NOW---
 		###
 		#rospy.init_node('Sender')
-		self.n = 0					####Take Away!
 		#Subscribe to the image
-		self.image_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.imgCallback)
+		#while not rospy.is_shutdown():
+		#self.image_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.imgCallback)
+		#senderLoop()
 
 	def setupSockets(self):
 		#Start the receiving socket
@@ -53,10 +55,8 @@ class Sender:
 		img_str = encimg.tostring()
 		#Get img info
 		(rows,cols,channels) = cv_image.shape
-		if self.n < 2000:					####### TAKE AWAY
-			send_str = self.makeProtoStr(rows,cols,channels,img_str)
-			self.send_msg(send_str)
-			self.n = self.n+1			#############TAKE AWAY
+		send_str = self.makeProtoStr(rows,cols,channels,img_str)
+		self.send_msg(send_str)
 		
 		nparr = np.fromstring(img_str, np.uint8) 		#########Take Away
 		dec_img = cv2.imdecode(nparr,1)				########Take Away
@@ -83,9 +83,17 @@ class Sender:
 		print "Shutdown"
 		self.socksend.close()
 
+	def senderLoop(self):
+		#Subscribe to the image
+		#while not rospy.is_shutdown():
+		self.image_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.imgCallback)
+		while not rospy.is_shutdown():
+			time.sleep(0.001)
+
 
 
 #rospy.init_node('Sender')
 #sender = Sender()
+#sender.senderLoop()
 #while not rospy.is_shutdown():
 #	time.sleep(0.001)

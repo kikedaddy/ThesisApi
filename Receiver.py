@@ -40,9 +40,9 @@ class Receiver:
 			sys.exit()
 
 	def receiveServer (self):
-		print "Enters recieveServer!"
+		#print "Enters recieveServer!"
 		conn, addr = self.sockrec.accept()
-		print "GETS HERE"
+		#print "GETS HERE"
 		
 		while not rospy.is_shutdown():
 			#Get the data from the socket. First 4bits are the length of the packet.
@@ -68,7 +68,7 @@ class Receiver:
 			move_cmd.angular.z = cmd.steering		
 			self.speed = move_cmd.linear.x
 			self.angle = move_cmd.angular.z
-			print "Different"
+			#print "Different"
 			return move_cmd
 		else:
 			return None
