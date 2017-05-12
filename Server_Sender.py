@@ -12,25 +12,25 @@ RPORT = 8888
 #The SSender class is responsible for sending speed and angle data to the ROS framework.
 #The SSender represents the first abstraction layer of the API
 #(Which is now glued together with Receiver on the same machine)
-class SSender(threading.Thread):
+class SSender:
 	speed = 0
 	angle = 0
 	def __init__(self):
+		self.running = True
 		self.speed = 0
 		self.angle = 0
-		self._stop_event = threading.Event()
-	def stop(self):
-		self._stop_event.set()
-	def stopped(self):
-		return self._stop_event.is_set()
-	def run(self):
-		if (self.stopped() == False):
-			#self._Thread__target(*self._Thread__args, **self._Thread__kwargs)
-			self.send_loop()
+
 	def send_msg(self, msg):
 		# Prefix each message with a 4-byte length (network byte order)
 		msg = struct.pack('>I', len(msg)) + msg
 		self.sock.sendall(msg)
+
+	def terminator(self):
+		self.running = False
+
+
+	def isRunning(self):
+		return self.running
 
 	def send_connect(self, addr, port):
 		s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,7 +51,7 @@ class SSender(threading.Thread):
 
 		self.send_connect("localhost", 8888)
 		
-		while 1:
+		while self.running:
 			sending = movement_pb2.Move()
 
 			sending.steering = self.angle #value from ROS
