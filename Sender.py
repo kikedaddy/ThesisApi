@@ -11,12 +11,13 @@ from cv_bridge import CvBridge, CvBridgeError
 import message_pb2
 import threading
 import time
-#
 
 sendPort = 8887
-sendAddress = ''		#'83.248.104.77'
+sendAddress = ''
 max_listen = 10
 
+#The sender class is responsible for sending images.
+#The sender represents the ROS library.
 class Sender:
 	def __init__(self):
 		self.bridge = CvBridge()
@@ -24,14 +25,6 @@ class Sender:
 		self.setupSockets()
 		rospy.on_shutdown(self.shutdown)
 		rospy.init_node('Sender')
-		###
-		###---ADDED NOW---
-		###
-		#rospy.init_node('Sender')
-		#Subscribe to the image
-		#while not rospy.is_shutdown():
-		#self.image_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.imgCallback)
-		#senderLoop()
 
 	def setupSockets(self):
 		#Start the receiving socket
@@ -57,11 +50,6 @@ class Sender:
 		(rows,cols,channels) = cv_image.shape
 		send_str = self.makeProtoStr(rows,cols,channels,img_str)
 		self.send_msg(send_str)
-		
-		nparr = np.fromstring(img_str, np.uint8) 		#########Take Away
-		dec_img = cv2.imdecode(nparr,1)				########Take Away
-		#cv2.imshow("Image window", dec_img)			#######Take Away
-		#cv2.waitKey(3)								########TAKE AWAY
 
 	def makeProtoStr (self, rows,cols,channels,img_str):
 		sending = message_pb2.Image()

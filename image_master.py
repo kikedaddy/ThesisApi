@@ -16,10 +16,3 @@ class ImageReceiver:
 		time.sleep(1)
 	def getImage(self):
 		return self.receiver.getImage()
-
-#rec = ImageReceiver()
-#i = 0
-#while i < 10:
-#	time.sleep(0.01)
-#	i += 1
-#print "Image: " + str(rec.getImage())

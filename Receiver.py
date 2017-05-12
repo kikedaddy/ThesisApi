@@ -18,16 +18,28 @@ listenPort = 8888
 listenAddress = ''
 max_listen = 10
 
-class Receiver:
+#The Receiver class is responsible for receiving speed and angle values from the 
+#SSender and publishing them to ROS.
+#The Receiver represents the ROS library.
+class Receiver(threading.Thread):
 	def __init__(self):
 		self.speed = 0
 		self.angle = 0
 		self.setupSockets()
+		self._stop_event = threading.Event()
 		rospy.init_node('Receiver', anonymous=False)
 		# What function to call when you ctrl + c    
 		rospy.on_shutdown(self.shutdown)
 		self.cmd_vel = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=10)
 
+	def stop(self):
+		self._stop_event.set()
+	def stopped(self):
+		return self._stop_event.is_set()
+	def run(self):
+		if (self.stopped() == False):
+			#self._Thread__target(*self._Thread__args, **self._Thread__kwargs)
+			self.receiveServer()
 	def setupSockets(self):
 		#Start the receiving socket
 		self.sockrec = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,7 +51,7 @@ class Receiver:
 			print "Connection failed"
 			sys.exit()
 
-	def receiveServer (self):
+	def receiveServer(self):
 		#print "Enters recieveServer!"
 		conn, addr = self.sockrec.accept()
 		#print "GETS HERE"

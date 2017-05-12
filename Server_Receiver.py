@@ -13,6 +13,9 @@ import numpy as np
 HOST = '' #An available interface
 PORT = 8887 #Any port
 
+#The SReceiver class is responsible for receiving images which later can be used by a user.
+#The SReceiver represents the first abstraction layer 
+#(which is atm glued together with Sender on the same machine)
 class SReceiver:
 	image = ""
 
@@ -58,8 +61,6 @@ class SReceiver:
 		self.s.listen(10)
 		print ' Socket is listening'
 
-		#return conn, addr	#Could include socket in return
-
 	def recv_msg_loop(self):
 		#Wait to accept connection
 		conn, addr = self.s.accept()
@@ -72,26 +73,16 @@ class SReceiver:
 			if data is None:
 				break
 
-			#To return the image as a string
-			self.image = data
-
 			#Get protobuf format
 			proto_img = message_pb2.Image()
 
 			#Parse proto message
 			proto_img.ParseFromString(data)
 
-			#Decode message with OpenCV
-			nparr = np.fromstring(proto_img.pic, np.uint8)
-			dec_img = cv2.imdecode(nparr, 1)
+			#To return the image as a string
+			self.image = proto_img.pic
 
-			#Show the image with OpenCV
-			cv2.imshow("Image window", dec_img)
-			cv2.waitKey(3)
-
-			#conn.send('You are connected...')
-
-		#conn.close() #Cannot close at this time
+		conn.close() #Cannot close at this time
 
 	def getImage(self):
 		return self.image
