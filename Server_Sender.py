@@ -4,6 +4,7 @@ import struct
 import threading
 import message_pb2
 import movement_pb2
+import time
 #
 
 RHOST = ""
@@ -21,6 +22,7 @@ class SSender:
 		self.angle = 0
 		self.oldSpeed = 0
 		self.oldAngle = 0
+		self.send_connect("localhost", 8888)
 
 	def send_msg(self, msg):
 		# Prefix each message with a 4-byte length (network byte order)
@@ -33,6 +35,10 @@ class SSender:
 
 	def isRunning(self):
 		return self.running
+
+	def send_loop(self):
+		while self.running:
+			time.sleep(0.001)
 
 	def send_connect(self, addr, port):
 		s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,32 +55,17 @@ class SSender:
 
 		self.sock = s2
 
-	def send_loop(self):
-
-		self.send_connect("localhost", 8888)
-		
-		while self.running:
-
-			sending = movement_pb2.Move()
-
-			sending.steering = self.angle #value from ROS
-			sending.movement = self.speed #value from ROS
-
-			send_str = sending.SerializeToString()
-
-			if self.speed != self.oldSpeed or self.angle != self.oldAngle:
-				self.send_msg(send_str)
-				self.oldSpeed = self.speed
-				self.oldAngle = self.angle
-				print "Info SENT!"
-		self.sock.close()
-
 	def setSpeed(self, speed):
-		self.speed = speed
+		sending = movement_pb2.Move()
+		sending.movement = speed #value from ROS
+		send_str = sending.SerializeToString()
+		self.send_msg(send_str)
 
 	def setAngle(self, angle):
-		self.angle = angle
-
+		sending = movement_pb2.Move()
+		sending.movement = angle #value from ROS
+		send_str = sending.SerializeToString()
+		self.send_msg(send_str)
 
 #sender = SSender()
 
