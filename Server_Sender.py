@@ -55,7 +55,7 @@ class SSender:
 
 	def setAngle(self, angle):
 		sending = movement_pb2.Move()
-		sending.movement = angle #value from ROS
+		sending.steering = angle #value from ROS
 		send_str = sending.SerializeToString()
 		self.send_msg(send_str)
 
