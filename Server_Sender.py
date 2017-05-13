@@ -19,6 +19,8 @@ class SSender:
 		self.running = True
 		self.speed = 0
 		self.angle = 0
+		self.oldSpeed = 0
+		self.oldAngle = 0
 
 	def send_msg(self, msg):
 		# Prefix each message with a 4-byte length (network byte order)
@@ -52,6 +54,7 @@ class SSender:
 		self.send_connect("localhost", 8888)
 		
 		while self.running:
+
 			sending = movement_pb2.Move()
 
 			sending.steering = self.angle #value from ROS
@@ -59,8 +62,11 @@ class SSender:
 
 			send_str = sending.SerializeToString()
 
-			#sock.send(send_str)
-			self.send_msg(send_str)
+			if self.speed != self.oldSpeed or self.angle != self.oldAngle:
+				self.send_msg(send_str)
+				self.oldSpeed = self.speed
+				self.oldAngle = self.angle
+				print "Info SENT!"
 		self.sock.close()
 
 	def setSpeed(self, speed):

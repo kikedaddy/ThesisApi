@@ -29,5 +29,6 @@ send.setAngle(0.5)
 time.sleep(1)
 
 send.terminate()
+#res.terminate()
 
 print "finished"

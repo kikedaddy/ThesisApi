@@ -57,8 +57,10 @@ class Receiver:
 			#print "connected with " + addr[0] + ":" + str(addr[1]) + ", received: " + str(data)
 			
 			move_cmd = self.makeCmd(data)
+			print "Making cmd"
 
 			if move_cmd != None:
+				print "Publishing data"
 				self.cmd_vel.publish(move_cmd)
 
 	def makeCmd(self, str_proto):
