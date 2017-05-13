@@ -67,7 +67,7 @@ class Receiver:
 		cmd = movement_pb2.Move()
 		cmd.ParseFromString(str_proto)
 
-		if self.speed != cmd.movement and self.angle != cmd.steering:
+		if self.speed != cmd.movement or self.angle != cmd.steering:
 			move_cmd = Twist()
 			move_cmd.linear.x = cmd.movement
 			move_cmd.angular.z = cmd.steering		
