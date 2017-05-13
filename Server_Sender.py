@@ -14,14 +14,8 @@ RPORT = 8888
 #The SSender represents the first abstraction layer of the API
 #(Which is now glued together with Receiver on the same machine)
 class SSender:
-	speed = 0
-	angle = 0
 	def __init__(self):
 		self.running = True
-		self.speed = 0
-		self.angle = 0
-		self.oldSpeed = 0
-		self.oldAngle = 0
 		self.send_connect("localhost", 8888)
 
 	def send_msg(self, msg):
@@ -43,8 +37,6 @@ class SSender:
 	def send_connect(self, addr, port):
 		s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s2.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-		#print 'Addr: ' + str(addr) + ", Port: " + str(port)
 
 		#Connect to host/port
 		try:

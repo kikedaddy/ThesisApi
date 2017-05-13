@@ -23,8 +23,9 @@ send = movement_master.Steering()
 #cv2.destroyAllWindows()
 
 #print "Setting commands"
+send.setAngle(1.6)
+time.sleep(0.5)
 send.setSpeed(2)
-send.setAngle(0.5)
 
 time.sleep(1)
 
