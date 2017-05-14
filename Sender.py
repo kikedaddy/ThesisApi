@@ -21,10 +21,17 @@ max_listen = 10
 class Sender:
 	def __init__(self):
 		self.bridge = CvBridge()
+		self.running = True
 		#Setup Socket
 		self.setupSockets()
 		rospy.on_shutdown(self.shutdown)
-		rospy.init_node('Sender')
+		#rospy.init_node('Sender')
+
+	def terminate(self):
+		self.running = False
+
+	def isRunning(self):
+		return self.running
 
 	def setupSockets(self):
 		#Start the receiving socket
@@ -75,7 +82,7 @@ class Sender:
 		#Subscribe to the image
 		#while not rospy.is_shutdown():
 		self.image_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.imgCallback)
-		while not rospy.is_shutdown():
+		while self.running:
 			time.sleep(0.001)
 
 

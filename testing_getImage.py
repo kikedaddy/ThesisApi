@@ -24,7 +24,7 @@ send = movement_master.Steering()
 
 #print "Setting commands"
 send.setAngle(1.6)
-time.sleep(0.5)
+time.sleep(1)
 send.setSpeed(2)
 
 time.sleep(1)

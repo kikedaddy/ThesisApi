@@ -66,17 +66,14 @@ class Receiver:
 	def makeCmd(self, str_proto):
 		cmd = movement_pb2.Move()
 		cmd.ParseFromString(str_proto)
-
-		if self.speed != cmd.movement or self.angle != cmd.steering:
-			move_cmd = Twist()
-			move_cmd.linear.x = cmd.movement
-			move_cmd.angular.z = cmd.steering		
-			self.speed = move_cmd.linear.x
-			self.angle = move_cmd.angular.z
-			#print "Different"
-			return move_cmd
-		else:
-			return None
+		#Get the Twist protocol
+		move_cmd = Twist()
+		move_cmd.linear.x = cmd.movement
+		move_cmd.angular.z = cmd.steering
+		self.speed = move_cmd.linear.x
+		self.angle = move_cmd.angular.z
+		#print "Different"
+		return move_cmd
 
 
 	def recv_msg(self, sock):
