@@ -86,14 +86,3 @@ class SReceiver:
 
 	def getImage(self):
 		return self.image
-
-#receiver = SReceiver()
-
-#conn, addr = receiver.connect()
-
-#print 'Got here!'
-
-#receiver.recv_msg_loop()
-
-#t1 = threading.Thread(target=receiver.recv_msg_loop, args=(conn, addr))
-#t1.daemon = True

@@ -43,9 +43,7 @@ class Receiver:
 			sys.exit()
 
 	def receiveServer(self):
-		#print "Enters recieveServer!"
 		conn, addr = self.sockrec.accept()
-		#print "GETS HERE"
 		
 		while 1:
 			#Get the data from the socket. First 4bits are the length of the packet.
@@ -54,8 +52,6 @@ class Receiver:
 			if data is None:
 				break
 
-			#print "connected with " + addr[0] + ":" + str(addr[1]) + ", received: " + str(data)
-			
 			move_cmd = self.makeCmd(data)
 			print "Making cmd"
 
@@ -72,7 +68,6 @@ class Receiver:
 		move_cmd.angular.z = cmd.steering
 		self.speed = move_cmd.linear.x
 		self.angle = move_cmd.angular.z
-		#print "Different"
 		return move_cmd
 
 
@@ -110,6 +105,3 @@ class Receiver:
 
 	def getAngle(self):
 		return self.angle
-
-#receiver = Receiver()
-#receiver.receiveServer()

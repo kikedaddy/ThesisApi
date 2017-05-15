@@ -32,7 +32,6 @@ class S(BaseHTTPRequestHandler):
         self._set_headers()
         
     def do_POST(self):
-        # Doesn't do anything with posted data
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
         if "speed" in post_data:
