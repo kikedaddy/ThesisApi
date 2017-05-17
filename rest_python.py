@@ -37,7 +37,7 @@ class S(BaseHTTPRequestHandler):
         if "speed" in post_data:
             speed = post_data.rsplit("=", -1)[1]
             print "Word: " + str(speed)
-            self.move.setSpeed(int(speed))
+            self.move.setSpeed(float(speed))
         if "angle" in post_data:
             angle = post_data.rsplit("=", -1)[1]
             print "Word: " + str(angle)
