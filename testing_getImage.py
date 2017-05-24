@@ -4,11 +4,19 @@ import time
 import numpy as np
 import cv2
 
-#rec = image_master.ImageReceiver()
-send = movement_master.Steering()
+rec = image_master.ImageReceiver()
+#send = movement_master.Steering()
+
+time.sleep(2)
 
 #print "This is the image"
-#img = rec.getImage()
+img = rec.getImage()
+
+time.sleep(1)
+
+print img
+
+print "THIS IS THE IMAGE"
 
 #Decode message with OpenCV
 #nparr = np.fromstring(img, np.uint8)
@@ -23,13 +31,13 @@ send = movement_master.Steering()
 #cv2.destroyAllWindows()
 
 #print "Setting commands"
-send.setAngle(1.6)
-time.sleep(0.5)
-send.setSpeed(2)
+#send.setAngle(1.6)
+#time.sleep(1)
+#send.setSpeed(2)
 
-time.sleep(1)
+#time.sleep(1)
 
-send.terminate()
-#res.terminate()
+#send.terminate()
+rec.terminate()
 
 print "finished"

@@ -58,19 +58,3 @@ class SSender:
 		sending.steering = angle #value from ROS
 		send_str = sending.SerializeToString()
 		self.send_msg(send_str)
-
-#sender = SSender()
-
-#sock = sender.send_connect(RHOST, RPORT)
-#print '2'
-#sending = movement_pb2.Move()
-#sending.steering = 0.5
-#sending.movement = 0
-#msg = sending.SerializeToString()
-#msg = "lol"
-#print '3'
-#sender.send_loop(sock, 0.5, 0.5)
-
-#t2 = threading.Thread(target=sender.send_loop, args=(sock, msg))
-#t2.daemon = True
-#t2.start()

@@ -17,7 +17,7 @@ import image_master
 
 class S(BaseHTTPRequestHandler):
     move = movement_master.Steering()
-    #image = image_master.ImageReceiver()
+    image = image_master.ImageReceiver()
 
     def _set_headers(self):
         self.send_response(200)
@@ -32,13 +32,12 @@ class S(BaseHTTPRequestHandler):
         self._set_headers()
         
     def do_POST(self):
-        # Doesn't do anything with posted data
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
         if "speed" in post_data:
-            speed = post_data.rsplit("speed=", -1)[1]
+            speed = post_data.rsplit("=", -1)[1]
             print "Word: " + str(speed)
-            self.move.setSpeed(int(speed))
+            self.move.setSpeed(float(speed))
         if "angle" in post_data:
             angle = post_data.rsplit("=", -1)[1]
             print "Word: " + str(angle)
